@@ -1,0 +1,137 @@
+substitutions:
+  devicename: rego600
+  device_description: "REGO 600"
+
+esphome:
+  name: ${devicename}
+  comment: ${device_description}
+  includes:
+    - rego600.h
+
+esp8266:
+  board: d1_mini
+
+wifi:
+  networks:
+  - ssid: !secret wifi.networks.ssid 
+    password: !secret wifi.networks.password
+  
+ # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    password: !secret wifi.ap.password
+
+  manual_ip:
+    static_ip: 192.168.5.8
+    gateway: 192.168.5.1
+    subnet: 255.255.255.0
+    dns1: 8.8.8.8
+    dns2: 8.8.4.4
+
+# mqtt:
+#   broker: aceone.se
+#   username: !secret mqtt.username
+#   password: !secret mqtt.password
+#   discovery: true
+
+captive_portal:
+
+web_server:
+
+# Enable logging
+logger:
+  level: DEBUG
+  baud_rate: 0 # disable logging over uart
+  
+# Enable Home Assistant API
+api:
+  password: !secret api.password
+
+ota:
+  password: !secret ota.password
+
+
+uart:
+  id: uart_bus
+  tx_pin: TX
+  rx_pin: RX
+  baud_rate: 19200
+
+custom_component:
+  - id: meter_sensor
+    lambda: |-
+      Rego600* meter_sensor = meter_sensor->createInstance(id(uart_bus));
+      App.register_component(meter_sensor);
+      return {meter_sensor};  
+sensor:
+- platform: custom
+  lambda: |-
+    Rego600* meter_sensor = meter_sensor->getInstance();
+    App.register_component(meter_sensor);
+    return {
+      meter_sensor->radiatorReturn,
+      meter_sensor->outdoor,
+      meter_sensor->hotWater,
+      meter_sensor->forward,
+      meter_sensor->room,
+      meter_sensor->compressorTemp,
+      meter_sensor->heatFluidOut,
+      meter_sensor->heatFluidIn,
+      meter_sensor->coldFluidIn,
+      meter_sensor->coldFluidOut,
+      meter_sensor->externalHotWater
+    };
+  sensors:
+    - name: "Radiator return[GT1]"
+      unit_of_measurement: °C
+      accuracy_decimals: 1
+    - name: "Outdoor [GT2]"
+      unit_of_measurement: °C
+      accuracy_decimals: 1
+    - name: "Hot water [GT3]"
+      unit_of_measurement: °C
+      accuracy_decimals: 1
+    - name: "Forward [GT4]"
+      unit_of_measurement: °C
+      accuracy_decimals: 1
+    - name: "Room [GT5]"
+      unit_of_measurement: °C
+      accuracy_decimals: 1
+    - name: " Compressor [GT6]"
+      unit_of_measurement: °C
+      accuracy_decimals: 1
+    - name: "Heat fluid out [GT8]"
+      unit_of_measurement: °C
+      accuracy_decimals: 1
+    - name: "Heat fluid in [GT9]"
+      unit_of_measurement: °C
+      accuracy_decimals: 1
+    - name: "Cold fluid in [GT10]"
+      unit_of_measurement: °C
+      accuracy_decimals: 1
+    - name: "Cold fluid out [GT11]"
+      unit_of_measurement: °C
+      accuracy_decimals: 1
+    - name: "External hot water [GT3x]"
+      unit_of_measurement: °C
+      accuracy_decimals: 1
+
+binary_sensor:
+- platform: custom
+  lambda: |-
+    Rego600* meter_sensor = meter_sensor->getInstance();
+    return {
+      meter_sensor->heat_carrier_pump,
+      meter_sensor->heat_fluid_pump,
+      meter_sensor->three_way_valve,
+      meter_sensor->additional_heat,
+      meter_sensor->compressor,
+      meter_sensor->cold_fluid_pump
+    };
+  binary_sensors:
+  - name: "Heat carrier pump"
+  - name: "Heat fluid pump"
+  - name: "Three-way valve"
+  - name: "Additional heat"
+  - name: "Compressor"
+  - name: "Cold fluid pump"
+

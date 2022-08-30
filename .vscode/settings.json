@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "*.tcc": "cpp",
+        "typeinfo": "cpp",
+        "cstddef": "cpp",
+        "iosfwd": "cpp",
+        "istream": "cpp",
+        "limits": "cpp",
+        "sstream": "cpp",
+        "streambuf": "cpp"
+    }
+}
