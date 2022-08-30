@@ -1,3 +1,5 @@
+[![ESPHome](https://github.com/henols/esphome-rego600/actions/workflows/esphome.yml/badge.svg)](https://github.com/henols/esphome-rego600/actions/workflows/esphome.yml)
+
 # esphome-rego600
 ESPHome custom component for Rego 600 heat pump controller, version , running on ESP8266.
 
